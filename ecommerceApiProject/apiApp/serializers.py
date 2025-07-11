@@ -1,10 +1,17 @@
 from rest_framework import serializers
-from .models import Product,Category,CustomUser,Cart,CartItem,Review
+from .models import Product,Category,CustomUser,Cart,CartItem,Review,WishList,EcoTag
 from django.contrib.auth import get_user_model
+
+class EcoTagSerializer(serializers.ModelSerializer):
+    class Meta:
+        model=EcoTag
+        fields=['id','name']
+
 class ProductListSerializer(serializers.ModelSerializer):
+    eco_tag=EcoTagSerializer(many=True,read_only=True)
     class Meta:
         model=Product
-        fields=('id','name','slug','image','price')
+        fields=('id','name','slug','image','price','eco_tag')
 
 class ProductDetailSerializer(serializers.ModelSerializer):
     class Meta:
@@ -73,3 +80,10 @@ class ReviewSerializer(serializers.ModelSerializer):
     class Meta:
         model=Review
         fields=['id','user','rating','review','created','updated']
+        
+class WishListSerializer(serializers.ModelSerializer):
+    user=UserSerializer(read_only=True)
+    product=ProductListSerializer(read_only=True)
+    class Meta:
+        model=WishList
+        fields=['id','user','product','created']
